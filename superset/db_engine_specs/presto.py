@@ -35,14 +35,13 @@ from typing import (
     Set,
     Tuple,
     TYPE_CHECKING,
-    Union,
-    ContextManager
+    Union
 )
 from urllib import parse
 
 import pandas as pd
 import simplejson as json
-from flask import current_app, request, session
+from flask import current_app, session
 from flask_babel import gettext as __, lazy_gettext as _
 from sqlalchemy import Column, literal_column, types
 from sqlalchemy.engine.base import Engine
@@ -303,9 +302,7 @@ class PrestoBaseEngineSpec(BaseEngineSpec, metaclass=ABCMeta):
     def adjust_database_uri(
         cls, uri: URL, selected_schema: Optional[str] = None
     ) -> URL:
-        logger.info(f'!!! -----> ADJUST_DB_URI URI={uri}')
         database = uri.database
-        logger.info(f'!!! -----> ADJUST_DB_URI DB={database}')
         if selected_schema and database:
             selected_schema = parse.quote(selected_schema, safe="")
             if "/" in database:
@@ -313,7 +310,6 @@ class PrestoBaseEngineSpec(BaseEngineSpec, metaclass=ABCMeta):
             else:
                 database += "/" + selected_schema
             uri = uri.set(database=database)
-        logger.info(f'!!! -----> ADJUST_DB_URI RESULT URI={uri}')
         return uri
 
     @classmethod
@@ -1300,27 +1296,28 @@ class PrestoEngineSpec(PrestoBaseEngineSpec):
     def get_extra_params(database: Database) -> Dict[str, Any]:
         """
         This method extends BaseEngineSpec.get_extra_params and adds to
-        database connection parameters session_properties dictionary
-        with containes jwt token
+        database connection parameters Session object with access token
+        in the headers
 
         :param database: database instance from which to extract extras
-        :raises CertificateException: If certificate is not valid/unparseable
         """
         extra: Dict[str, Any] = BaseEngineSpec.get_extra_params(database)
-        token = PrestoEngineSpec._get_jwt_token()
-        extra["http_headers"] = {"Authorization": f"Bearer {token}"}
-        extra["headers"] = {"Authorization": f"Bearer {token}"}
+        oauth_token = PrestoEngineSpec._get_jwt_token()
+        if oauth_token:
+            import requests
+            session = requests.Session()
+            headers = {'X-Presto-Extra-Credential': f"access-token='Bearer {oauth_token}'"}
+            session.headers.update(headers)
+            engine_params = extra.get("engine_params", {})
+            connect_args = engine_params.get("connect_args", {})
+            connect_args["requests_session"] = session
+            engine_params["connect_args"] = connect_args
+            extra["engine_params"] = engine_params
         return extra
     
     @staticmethod
     def _get_jwt_token():
-        import jwt
         oauth_cookies = session['oauth']
         if oauth_cookies:
             jwt_token = oauth_cookies[0]
-
-        if jwt_token:
-            #decoded_token = jwt.decode(jwt_token, algorithms=['RS256'], options={'verify_signature': False})
             return jwt_token
-        else:
-            raise ValueError(f"JWT_TOKEN not found in session scope: {session}")

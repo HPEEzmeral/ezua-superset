@@ -1303,10 +1303,13 @@ class PrestoEngineSpec(PrestoBaseEngineSpec):
         """
         extra: Dict[str, Any] = BaseEngineSpec.get_extra_params(database)
         oauth_token = PrestoEngineSpec._get_jwt_token()
+
         if oauth_token:
             import requests
             session = requests.Session()
-            headers = {'X-Presto-Extra-Credential': f"access-token='Bearer {oauth_token}'"}
+            headers = {
+                'Authorization': f'Bearer {oauth_token}'
+            }
             session.headers.update(headers)
             engine_params = extra.get("engine_params", {})
             connect_args = engine_params.get("connect_args", {})

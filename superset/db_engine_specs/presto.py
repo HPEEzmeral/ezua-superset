@@ -41,7 +41,7 @@ from urllib import parse
 
 import pandas as pd
 import simplejson as json
-from flask import current_app, session
+from flask import current_app
 from flask_babel import gettext as __, lazy_gettext as _
 from sqlalchemy import Column, literal_column, types
 from sqlalchemy.engine.base import Engine
@@ -1301,26 +1301,23 @@ class PrestoEngineSpec(PrestoBaseEngineSpec):
 
         :param database: database instance from which to extract extras
         """
-        extra: Dict[str, Any] = BaseEngineSpec.get_extra_params(database)
-        oauth_token = PrestoEngineSpec._get_jwt_token()
+        from flask import request as r
+        import requests
+        session = requests.Session()
 
-        if oauth_token:
-            import requests
-            session = requests.Session()
-            headers = {
-                'Authorization': f'Bearer {oauth_token}'
-            }
-            session.headers.update(headers)
-            engine_params = extra.get("engine_params", {})
-            connect_args = engine_params.get("connect_args", {})
+        extra: Dict[str, Any] = BaseEngineSpec.get_extra_params(database)
+        engine_params = extra.get("engine_params", {})
+        connect_args = engine_params.get("connect_args", {})
+        connect_args.update({
+            "protocol": "https",
+            "requests_kwargs": {"verify": False}
+        })
+
+        auth_header = r.headers.get("Authorization")
+        if auth_header:           
+            session.headers["Authorization"] = auth_header
             connect_args["requests_session"] = session
-            engine_params["connect_args"] = connect_args
-            extra["engine_params"] = engine_params
+            
+        engine_params["connect_args"] = connect_args
+        extra["engine_params"] = engine_params            
         return extra
-    
-    @staticmethod
-    def _get_jwt_token():
-        oauth_cookies = session['oauth']
-        if oauth_cookies:
-            jwt_token = oauth_cookies[0]
-            return jwt_token

@@ -1366,3 +1366,33 @@ class PrestoEngineSpec(PrestoBaseEngineSpec):
         """
 
         return True
+
+    @staticmethod
+    def get_extra_params(database: Database) -> Dict[str, Any]:
+        """
+        This method extends BaseEngineSpec.get_extra_params and adds to
+        database connection parameters Session object with access token
+        in the headers
+
+        :param database: database instance from which to extract extras
+        """
+        from flask import request as r
+        import requests
+        session = requests.Session()
+
+        extra: Dict[str, Any] = BaseEngineSpec.get_extra_params(database)
+        engine_params = extra.get("engine_params", {})
+        connect_args = engine_params.get("connect_args", {})
+        connect_args.update({
+            "protocol": "https",
+            "requests_kwargs": {"verify": False}
+        })
+
+        auth_header = r.headers.get("Authorization")
+        if auth_header:           
+            session.headers["Authorization"] = auth_header
+            connect_args["requests_session"] = session
+            
+        engine_params["connect_args"] = connect_args
+        extra["engine_params"] = engine_params            
+        return extra

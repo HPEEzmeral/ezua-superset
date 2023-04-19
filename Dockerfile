@@ -135,6 +135,8 @@ RUN --mount=type=bind,target=./requirements/base.txt,src=./requirements/base.txt
     pip install -r requirements/docker.txt
 
 USER superset
+
+
 ######################################################################
 # CI image...
 ######################################################################

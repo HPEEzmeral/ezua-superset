@@ -138,6 +138,10 @@ RUN wget https://download-installer.cdn.mozilla.net/pub/firefox/releases/${FIREF
 RUN cd /app \
     && pip install --no-cache -r requirements/docker.txt \
     && pip install --no-cache -r requirements/requirements-local.txt || true
+
+# # Fix for EZAF-583 was moved here as the network may be not available in the non-airgap environment
+# RUN apt-get update ; apt-get upgrade -y ; apt-get install -y git ; \
+#     pip install --force-reinstall git+https://github.com/benoitc/gunicorn.git@master
 USER superset
 
 

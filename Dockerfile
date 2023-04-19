@@ -137,6 +137,8 @@ RUN pip install --no-cache-dir -r /app/requirements/docker.txt \
     && pip install --no-cache-dir -r /app/requirements/requirements-local.txt || true
 
 USER superset
+
+
 ######################################################################
 # CI image...
 ######################################################################

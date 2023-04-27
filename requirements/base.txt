@@ -20,6 +20,8 @@ attrs==23.2.0
     #   cattrs
     #   jsonschema
     #   requests-cache
+authlib==1.2.0
+    # via jsonschema
 babel==2.15.0
     # via flask-babel
 backoff==2.2.1

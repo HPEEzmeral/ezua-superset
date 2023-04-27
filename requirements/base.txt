@@ -187,6 +187,7 @@ polyline==1.4.0
 prison==0.2.1
     # via flask-appbuilder
 prompt-toolkit==3.0.28
+psycopg2-binary==2.9.5
     # via click-repl
 pyarrow==10.0.1
     # via apache-superset

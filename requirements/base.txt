@@ -251,6 +251,7 @@ polyline==2.0.0
     # via apache-superset
 prison==0.2.1
     # via flask-appbuilder
+prometheus_flask_exporter==0.22.4
 prompt-toolkit==3.0.38
     # via click-repl
 pyarrow==14.0.1

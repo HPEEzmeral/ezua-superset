@@ -65,10 +65,13 @@ RUN mkdir -p ${PYTHONPATH} \
             libsasl2-modules-gssapi-mit \
             libpq-dev \
             libecpg-dev \
+            git \
         && rm -rf /var/lib/apt/lists/*
 
 COPY ./requirements/*.txt  /app/requirements/
 COPY setup.py MANIFEST.in README.md /app/
+
+RUN pip install --force-reinstall git+https://github.com/HPEEzmeral/ezua-gunicorn.git@master
 
 # setup.py uses the version information in package.json
 COPY superset-frontend/package.json /app/superset-frontend/
@@ -139,9 +142,6 @@ RUN cd /app \
     && pip install --no-cache -r requirements/docker.txt \
     && pip install --no-cache -r requirements/requirements-local.txt || true
 
-# # Fix for EZAF-583 was moved here as the network may be not available in the non-airgap environment
-# RUN apt-get update ; apt-get upgrade -y ; apt-get install -y git ; \
-#     pip install --force-reinstall git+https://github.com/benoitc/gunicorn.git@master
 USER superset
 
 

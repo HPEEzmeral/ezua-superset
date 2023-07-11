@@ -65,6 +65,7 @@ RUN mkdir -p ${PYTHONPATH} \
             libsasl2-modules-gssapi-mit \
             libpq-dev \
             libecpg-dev \
+            git \
         && rm -rf /var/lib/apt/lists/*
 
 COPY ./requirements/*.txt  /app/requirements/
@@ -77,6 +78,8 @@ RUN cd /app \
     && mkdir -p superset/static \
     && touch superset/static/version_info.json \
     && pip install --no-cache -r requirements/local.txt
+
+RUN pip install --force-reinstall git+https://github.com/benoitc/gunicorn.git@master
 
 COPY --from=superset-node /app/superset/static/assets /app/superset/static/assets
 
@@ -114,7 +117,7 @@ COPY ./requirements/*.txt ./docker/requirements-*.txt/ /app/requirements/
 USER root
 
 RUN apt-get update -y \
-    && apt-get install -y --no-install-recommends libnss3 libdbus-glib-1-2 libgtk-3-0 libx11-xcb1 wget
+    && apt-get install -y --no-install-recommends libnss3 libdbus-glib-1-2 libgtk-3-0 libx11-xcb1 wget git
 
 # Install GeckoDriver WebDriver
 RUN wget https://github.com/mozilla/geckodriver/releases/download/${GECKODRIVER_VERSION}/geckodriver-${GECKODRIVER_VERSION}-linux64.tar.gz -O /tmp/geckodriver.tar.gz && \
@@ -133,8 +136,6 @@ RUN cd /app \
     && pip install --no-cache -r requirements/requirements-local.txt || true
 
 # # Fix for EZAF-583 was moved here as the network may be not available in the non-airgap environment
-# RUN apt-get update ; apt-get upgrade -y ; apt-get install -y git ; \
-#     pip install --force-reinstall git+https://github.com/benoitc/gunicorn.git@master
 USER superset
 
 

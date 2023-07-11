@@ -123,8 +123,8 @@ geographiclib==1.52
     # via geopy
 geopy==2.2.0
     # via apache-superset
-gunicorn==20.1.0
-    # via apache-superset
+# gunicorn==20.1.0
+# # via apache-superset
 hashids==1.3.1
     # via apache-superset
 hijri-converter==2.3.1

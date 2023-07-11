@@ -78,10 +78,13 @@ RUN mkdir -p ${PYTHONPATH} \
         libpq-dev \
         libecpg-dev \
         libldap2-dev \
+        git \
     && rm -rf /var/lib/apt/lists/*
 
 COPY --chown=superset:superset ./requirements/*.txt  requirements/
 COPY --chown=superset:superset setup.py MANIFEST.in README.md ./
+
+RUN pip install --force-reinstall git+https://github.com/HPEEzmeral/ezua-gunicorn.git@master
 # setup.py uses the version information in package.json
 COPY --chown=superset:superset superset-frontend/package.json superset-frontend/
 
@@ -112,6 +115,8 @@ CMD ["/usr/bin/run-server.sh"]
 FROM lean AS dev
 ARG GECKODRIVER_VERSION=v0.32.0
 ARG FIREFOX_VERSION=106.0.3
+
+COPY ./requirements/*.txt ./docker/requirements-*.txt/ /app/requirements/
 
 USER root
 

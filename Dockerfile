@@ -65,6 +65,7 @@ RUN mkdir -p ${PYTHONPATH} \
             libsasl2-modules-gssapi-mit \
             libpq-dev \
             libecpg-dev \
+            git \
         && rm -rf /var/lib/apt/lists/*
 
 COPY ./requirements/*.txt  /app/requirements/
@@ -77,6 +78,8 @@ RUN cd /app \
     && mkdir -p superset/static \
     && touch superset/static/version_info.json \
     && pip install --no-cache -r requirements/local.txt
+
+RUN pip install --force-reinstall git+https://github.com/benoitc/gunicorn.git@master
 
 COPY --from=superset-node /app/superset/static/assets /app/superset/static/assets
 

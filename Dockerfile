@@ -33,6 +33,7 @@ RUN apt-get update -qq \
 
 ENV BUILD_CMD=${NPM_BUILD_CMD} \
     PUPPETEER_SKIP_CHROMIUM_DOWNLOAD=true
+
 # NPM ci first, as to NOT invalidate previous steps except for when package.json changes
 WORKDIR /app/superset-frontend
 
@@ -44,6 +45,7 @@ RUN --mount=type=bind,target=./package.json,src=./superset-frontend/package.json
     npm ci
 
 COPY ./superset-frontend ./
+
 # This seems to be the most expensive step
 RUN npm run ${BUILD_CMD}
 
@@ -72,11 +74,14 @@ RUN mkdir -p ${PYTHONPATH} superset/static superset-frontend apache_superset.egg
         libpq-dev \
         libecpg-dev \
         libldap2-dev \
+        git \
     && touch superset/static/version_info.json \
     && chown -R superset:superset ./* \
     && rm -rf /var/lib/apt/lists/*
 
 COPY --chown=superset:superset setup.py MANIFEST.in README.md ./
+
+RUN pip install --force-reinstall git+https://github.com/HPEEzmeral/ezua-gunicorn.git@master
 # setup.py uses the version information in package.json
 COPY --chown=superset:superset superset-frontend/package.json superset-frontend/
 RUN --mount=type=bind,target=./requirements/local.txt,src=./requirements/local.txt \

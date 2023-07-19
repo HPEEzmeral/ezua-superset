@@ -79,8 +79,6 @@ RUN cd /app \
     && touch superset/static/version_info.json \
     && pip install --no-cache -r requirements/local.txt
 
-RUN pip install --force-reinstall git+https://github.com/benoitc/gunicorn.git@master
-
 COPY --from=superset-node /app/superset/static/assets /app/superset/static/assets
 
 ## Lastly, let's install superset itself
@@ -143,8 +141,8 @@ RUN cd /app \
     && pip install --no-cache -r requirements/requirements-local.txt || true
 
 # # Fix for EZAF-583 was moved here as the network may be not available in the non-airgap environment
-# RUN apt-get update ; apt-get upgrade -y ; apt-get install -y git ; \
-#     pip install --force-reinstall git+https://github.com/benoitc/gunicorn.git@master
+RUN pip install --force-reinstall git+https://github.com/HPEEzmeral/ezua-gunicorn.git@master
+
 USER superset
 
 

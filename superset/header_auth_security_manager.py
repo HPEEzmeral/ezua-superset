@@ -71,13 +71,20 @@ class HeaderAuthRemoteUserView(AuthView):
             if token_payload:
                 first_name = token_payload.get("given_name", first_name)
                 last_name = token_payload.get("family_name", last_name)
+                
+                groups = token_payload.get("groups")
+                if "admin" in groups:
+                    role_name = ab_security_manager.auth_role_admin
+                else:
+                    # The default authentication role should be defined in helm/superset/values.yaml as AUTH_USER_REGISTRATION_ROLE
+                    role_name = ab_security_manager.auth_user_registration_role
 
             user = ab_security_manager.add_user(
                 username=username,
                 first_name=first_name,
                 last_name=last_name,
                 email=email,
-                role=ab_security_manager.find_role(ab_security_manager.auth_user_registration_role),
+                role = ab_security_manager.find_role(role_name)
             )
 
         return user

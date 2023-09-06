@@ -1,14 +1,14 @@
 import jwt
 from flask import Request, flash, g, redirect, request, session
 from flask_appbuilder._compat import as_unicode
+from flask_appbuilder.security.manager import AUTH_REMOTE_USER
 from flask_appbuilder.security.views import AuthView
 from flask_appbuilder.utils.base import get_safe_redirect
 from flask_appbuilder.views import expose
 from flask_login import login_user, logout_user
+from superset.security.manager import SupersetSecurityManager
 from werkzeug.sansio.utils import get_current_url
 from werkzeug.wrappers import Response as WerkzeugResponse
-from flask_appbuilder.security.manager import AUTH_REMOTE_USER
-from superset.security.manager import SupersetSecurityManager
 
 
 # Custom Authenticator based on principals in request headers
@@ -59,6 +59,33 @@ class HeaderAuthRemoteUserView(AuthView):
         next_url = request.args.get("next", "")
         return redirect(get_safe_redirect(next_url))
 
+    def __get_or_create_custom_role(self, role_name: str):
+        ab_security_manager = self.appbuilder.sm
+
+        custom_alpha_role = ab_security_manager.find_role(role_name)
+        if custom_alpha_role:
+            return
+        
+        alpha_role = ab_security_manager.find_role("Alpha")
+        if alpha_role:
+            alpha_permissions = alpha_role.permissions
+            custom_alpha_role = ab_security_manager.add_role(
+                role_name,
+                alpha_permissions
+            )
+            
+            if custom_alpha_role is None:
+                raise Exception(f"Cannot create {role_name} role")
+
+            write_db_perm = ab_security_manager.find_permission_view_menu('can_write', 'Database')
+            if write_db_perm:
+                custom_alpha_role.permissions.append(write_db_perm)
+                ab_security_manager.get_session.commit()
+            else:
+                raise Exception("'can_write Database' permission does not exist")
+        else:
+            raise Exception("Alpha role not found")
+
     def __get_or_create_user(self, username):
         ab_security_manager = self.appbuilder.sm
         user = ab_security_manager.find_user(username)
@@ -78,6 +105,8 @@ class HeaderAuthRemoteUserView(AuthView):
                 else:
                     # The default authentication role should be defined in helm/superset/values.yaml as AUTH_USER_REGISTRATION_ROLE
                     role_name = ab_security_manager.auth_user_registration_role
+                    
+            self.__get_or_create_custom_role(role_name)
 
             user = ab_security_manager.add_user(
                 username=username,

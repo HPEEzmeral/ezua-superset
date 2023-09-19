@@ -1,5 +1,5 @@
 import jwt
-from flask import Request, flash, g, redirect, request, session
+from flask import Request, flash, g, redirect, request
 from flask_appbuilder._compat import as_unicode
 from flask_appbuilder.security.manager import AUTH_REMOTE_USER
 from flask_appbuilder.security.views import AuthView
@@ -62,27 +62,39 @@ class HeaderAuthRemoteUserView(AuthView):
     def __get_or_create_custom_role(self, role_name: str):
         ab_security_manager = self.appbuilder.sm
 
-        custom_alpha_role = ab_security_manager.find_role(role_name)
-        if custom_alpha_role:
+        custom_role = ab_security_manager.find_role(role_name)
+                
+        if custom_role:
             return
-        
+
         alpha_role = ab_security_manager.find_role("Alpha")
         if alpha_role:
-            alpha_permissions = alpha_role.permissions
-            custom_alpha_role = ab_security_manager.add_role(
+            role_permissions = alpha_role.permissions
+
+            custom_role = ab_security_manager.add_role(
                 role_name,
-                alpha_permissions
+                role_permissions
             )
             
-            if custom_alpha_role is None:
+            if custom_role is None:
                 raise Exception(f"Cannot create {role_name} role")
 
-            write_db_perm = ab_security_manager.find_permission_view_menu('can_write', 'Database')
-            if write_db_perm:
-                custom_alpha_role.permissions.append(write_db_perm)
-                ab_security_manager.get_session.commit()
+            # EZAF-3082
+            can_write_db_perm = ab_security_manager.find_permission_view_menu(permission_name='can_write', 
+                                                                              view_menu_name='Database')
+            if can_write_db_perm:
+                ab_security_manager.add_permission_role(custom_role, can_write_db_perm)
             else:
                 raise Exception("'can_write Database' permission does not exist")
+
+            # EZAF-3131
+            all_ds_access_perm = ab_security_manager.find_permission_view_menu(permission_name='all_datasource_access', 
+                                                                               view_menu_name='all_datasource_access')
+            if all_ds_access_perm:
+                ab_security_manager.del_permission_role(custom_role, all_ds_access_perm)
+            else:
+                raise Exception("'all_datasource_access on all_datasource_access' permission does not exist")
+            
         else:
             raise Exception("Alpha role not found")
 

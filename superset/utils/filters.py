@@ -17,6 +17,7 @@
 from typing import Any, Type
 
 from flask_appbuilder import Model
+from flask_login import current_user
 from sqlalchemy import or_
 from sqlalchemy.sql.elements import BooleanClauseList
 
@@ -37,5 +38,8 @@ def get_dataset_access_filters(
         Database.id.in_(database_ids),
         base_model.perm.in_(perms),
         base_model.schema_perm.in_(schema_perms),
-        *args,
+        
+        # HPE EZAF-3131 - alpha-based users shouldn't see the datasets/charts of other users until they get the ownership of these resources
+        base_model.owners.contains(current_user),
+        *args,        
     )

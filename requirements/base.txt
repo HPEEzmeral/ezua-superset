@@ -82,12 +82,14 @@ cryptography==41.0.2
     # via
     #   apache-superset
     #   paramiko
+databend==1.2.344
 deprecated==1.2.13
     # via limits
 deprecation==2.1.0
     # via apache-superset
 dnspython==2.1.0
     # via email-validator
+DorisClient==1.2.9
 email-validator==1.1.3
     # via flask-appbuilder
 exceptiongroup==1.1.1
@@ -300,7 +302,7 @@ rich==13.3.4
     # via flask-limiter
 selenium==3.141.0
     # via apache-superset
-shillelagh==1.2.10
+shillelagh[all]==1.2.17
     # via apache-superset
 shortid==0.1.2
     # via apache-superset
@@ -334,6 +336,7 @@ sqlparse==0.4.4
     # via apache-superset
 sshtunnel==0.4.0
     # via apache-superset
+starrocks==1.0.6
 tabulate==0.8.9
     # via apache-superset
 typing-extensions==4.4.0

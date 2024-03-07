@@ -355,6 +355,7 @@ sqlparse==0.5.0
     # via apache-superset
 sshtunnel==0.4.0
     # via apache-superset
+starrocks==1.0.6
 tabulate==0.8.10
     # via apache-superset
 typing-extensions==4.12.0

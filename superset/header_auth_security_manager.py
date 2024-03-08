@@ -120,7 +120,7 @@ class HeaderAuthRemoteUserView(AuthView):
         role = ab_security_manager.find_role(role_name)
         if role:
             return role
-        
+
         alpha_role = ab_security_manager.find_role("Alpha")
         if alpha_role:
             alpha_permissions = alpha_role.permissions
@@ -149,6 +149,9 @@ class HeaderAuthRemoteUserView(AuthView):
         
         # Get user info from request headers
         email = self.__get_email_from_request(request)
+        if email is None:
+            email = f'{username}@email.notfound'
+        
         first_name = username
         last_name = "-"
         is_platform_admin = self.__PLATFORM_ADMIN_ROLE in self.__get_groups_from_request(request)

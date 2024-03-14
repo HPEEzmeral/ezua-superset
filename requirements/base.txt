@@ -144,6 +144,7 @@ geographiclib==1.52
     # via geopy
 geopy==2.2.0
     # via apache-superset
+gevent==24.2.1
 greenlet==2.0.2
     # via shillelagh
 gunicorn==21.2.0

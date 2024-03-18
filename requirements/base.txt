@@ -83,7 +83,7 @@ cryptography==42.0.7
     #   apache-superset
     #   paramiko
     #   pyopenssl
-databend==1.2.810
+databend-sqlalchemy==0.5.2
     # via apache-superset
 deprecated==1.2.14
     # via limits
@@ -91,8 +91,6 @@ deprecation==2.1.0
     # via apache-superset
 dnspython==2.6.1
     # via email-validator
-DorisClient==1.2.22
-    # via apache-superset
 email-validator==2.1.1
     # via flask-appbuilder
 flask==2.3.3
@@ -275,6 +273,8 @@ pyasn1-modules==0.4.0
     # via google-auth
 pycparser==2.22
     # via cffi
+pydoris==1.1.0
+    # via apache-superset
 pygments==2.18.0
     # via rich
 pyjwt==2.8.0
@@ -326,7 +326,7 @@ rsa==4.9
     # via google-auth
 selenium==3.141.0
     # via apache-superset
-shillelagh[all]==1.2.18
+shillelagh[all]==1.2.19
     # via apache-superset
 shortid==0.1.2
     # via apache-superset
@@ -360,7 +360,7 @@ sqlparse==0.5.0
     # via apache-superset
 sshtunnel==0.4.0
     # via apache-superset
-starrocks==1.2.3
+starrocks==1.0.6
     # via apache-superset
 tabulate==0.8.10
     # via apache-superset

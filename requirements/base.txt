@@ -271,6 +271,7 @@ pyasn1-modules==0.4.0
     # via google-auth
 pycparser==2.22
     # via cffi
+pydoris==1.0.5.3
 pygments==2.18.0
     # via rich
 pyjwt==2.8.0

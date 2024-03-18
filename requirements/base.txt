@@ -82,14 +82,13 @@ cryptography==42.0.4
     # via
     #   apache-superset
     #   paramiko
-databend==1.2.344
+databend_sqlalchemy==0.4.5
 deprecated==1.2.13
     # via limits
 deprecation==2.1.0
     # via apache-superset
 dnspython==2.1.0
     # via email-validator
-DorisClient==1.2.9
 email-validator==1.1.3
     # via flask-appbuilder
 flask==2.2.5
@@ -255,6 +254,7 @@ prison==0.2.1
 prompt-toolkit==3.0.38
     # via click-repl
 pyarrow==14.0.1
+pydoris==1.0.5.3
     # via apache-superset
 pyasn1==0.5.1
     # via

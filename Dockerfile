@@ -72,11 +72,14 @@ RUN mkdir -p ${PYTHONPATH} superset/static superset-frontend apache_superset.egg
         libpq-dev \
         libecpg-dev \
         libldap2-dev \
+        git \
     && touch superset/static/version_info.json \
     && chown -R superset:superset ./* \
     && rm -rf /var/lib/apt/lists/*
 
 COPY --chown=superset:superset setup.py MANIFEST.in README.md ./
+
+RUN pip install --force-reinstall git+https://github.com/HPEEzmeral/ezua-gunicorn.git@master
 # setup.py uses the version information in package.json
 COPY --chown=superset:superset superset-frontend/package.json superset-frontend/
 RUN --mount=type=bind,target=./requirements/local.txt,src=./requirements/local.txt \

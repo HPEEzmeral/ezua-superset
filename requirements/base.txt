@@ -83,8 +83,6 @@ cryptography==42.0.7
     #   apache-superset
     #   paramiko
     #   pyopenssl
-databend-sqlalchemy==0.5.2
-    # via apache-superset
 deprecated==1.2.14
     # via limits
 deprecation==2.1.0

@@ -84,7 +84,6 @@ cryptography==42.0.4
     # via
     #   apache-superset
     #   paramiko
-databend_sqlalchemy==0.4.5
 deprecated==1.2.13
     # via limits
 deprecation==2.1.0

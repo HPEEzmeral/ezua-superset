@@ -524,7 +524,7 @@ class ParsedQuery:
         return self._parsed[0].get_type() == "UNKNOWN"
 
     def stripped(self) -> str:
-        return self.sql.strip(" \t\r\n;")
+       return str(self.sql).strip(" \t\r\n;")
 
     def strip_comments(self) -> str:
         return sqlparse.format(self.stripped(), strip_comments=True)

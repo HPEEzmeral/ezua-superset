@@ -149,17 +149,20 @@ class HeaderAuthRemoteUserView(AuthView):
         
         # Get user info from request headers
         email = self.__get_email_from_request(request)
-        if email is None:
-            email = f'{username}@email.notfound'
         
         first_name = username
         last_name = "-"
         is_platform_admin = self.__PLATFORM_ADMIN_ROLE in self.__get_groups_from_request(request)
 
         token_payload = self.__get_decoded_jwt_from_request(request)
-        
-        first_name = token_payload.get("given_name", first_name)
-        last_name = token_payload.get("family_name", last_name)
+        if token_payload:
+            first_name = token_payload.get("given_name", first_name)
+            last_name = token_payload.get("family_name", last_name)
+            if email is None:
+                email = token_payload.get("email")
+ 
+        if email is None:
+            email = f'{username}@email.notfound'
         
         if is_platform_admin:
             role_name = ab_security_manager.auth_role_admin

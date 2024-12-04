@@ -122,16 +122,26 @@ AIRGAP_REGISTRY ?= lr1-bd-harbor-registry.mip.storage.hpecorp.net/develop
 IMG_NAME := gcr.io/mapr-252711/superset/superset
 GIT_HASH := $(shell git log -n1 --pretty=%h)
 IS_DIRTY := $(shell git diff-index --quiet HEAD -- || echo "-is-dirty")
-IMG_TAG ?= 3.1.0-hpe-ezaf-$(GIT_HASH)$(IS_DIRTY)
+VERSION := 4.1.1
+IMG_TAG ?= $(VERSION)-hpe-ezaf-$(GIT_HASH)$(IS_DIRTY)
+DOCKERIZE_TAG := $(VERSION)-dockerize
 
 docker-build:	
-    docker build . -t $(IMG_NAME):$(IMG_TAG)
-    $(ifneq(,$(AIRGAP_REGISTRY)))
-        docker tag $(IMG_NAME):$(IMG_TAG) $(AIRGAP_REGISTRY)/$(IMG_NAME):$(IMG_TAG)
-    $(endif)
+	docker build . -t $(IMG_NAME):$(IMG_TAG)
+	$(if $(AIRGAP_REGISTRY), docker tag $(IMG_NAME):$(IMG_TAG) $(AIRGAP_REGISTRY)/$(IMG_NAME):$(IMG_TAG))
 
 docker-push:
-    docker push $(IMG_NAME):$(IMG_TAG)
-    $(ifneq(,$(AIRGAP_REGISTRY)))
-        docker push $(AIRGAP_REGISTRY)/$(IMG_NAME):$(IMG_TAG)
-    $(endif)
+	docker push $(IMG_NAME):$(IMG_TAG)
+	$(if $(AIRGAP_REGISTRY), docker push $(AIRGAP_REGISTRY)/$(IMG_NAME):$(IMG_TAG))
+
+dockerize-build:
+	docker build . -f dockerize.Dockerfile -t $(IMG_NAME):$(DOCKERIZE_TAG)
+	$(if $(AIRGAP_REGISTRY), docker tag $(IMG_NAME):$(DOCKERIZE_TAG) $(AIRGAP_REGISTRY)/$(IMG_NAME):$(DOCKERIZE_TAG))
+
+dockerize-push:
+	docker push $(IMG_NAME):$(DOCKERIZE_TAG)
+	$(if $(AIRGAP_REGISTRY), docker push $(AIRGAP_REGISTRY)/$(IMG_NAME):$(DOCKERIZE_TAG))
+
+build-all: docker-build dockerize-build
+
+push-all: docker-push dockerize-push

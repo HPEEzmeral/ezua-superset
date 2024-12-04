@@ -95,6 +95,7 @@ COPY --chown=superset:superset requirements/base.txt requirements/
 RUN --mount=type=cache,target=/root/.cache/pip \
     apt-get update -qq && apt-get install -yqq --no-install-recommends \
       build-essential \
+      pkg-config \
     && pip install --upgrade setuptools pip \
     && pip install -r requirements/base.txt \
     && apt-get autoremove -yqq --purge build-essential \

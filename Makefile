@@ -122,7 +122,7 @@ AIRGAP_REGISTRY ?= lr1-bd-harbor-registry.mip.storage.hpecorp.net/develop
 IMG_NAME := hpe-superset/superset
 GIT_HASH := $(shell git log -n1 --pretty=%h)
 IS_DIRTY := $(shell git diff-index --quiet HEAD -- || echo "-is-dirty")
-VERSION := 4.1.1
+VERSION := 4.1.2
 IMG_TAG ?= $(VERSION)-hpe-ezaf-$(GIT_HASH)$(IS_DIRTY)
 DOCKERIZE_TAG := $(VERSION)-dockerize
 

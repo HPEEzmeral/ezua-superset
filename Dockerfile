@@ -18,7 +18,7 @@
 ######################################################################
 # Node stage to deal with static asset construction
 ######################################################################
-ARG PY_VER=3.9-slim-bookworm
+ARG PY_VER=3.11-slim
 
 # if BUILDPLATFORM is null, set it to 'amd64' (or leave as is otherwise).
 ARG BUILDPLATFORM=${BUILDPLATFORM:-amd64}
@@ -29,7 +29,8 @@ ARG NPM_BUILD_CMD="build"
 RUN apt-get update -qq \
     && apt-get install -yqq --no-install-recommends \
         build-essential \
-        python3
+        python3 \
+    && apt-get upgrade -yqq
 
 ENV BUILD_CMD=${NPM_BUILD_CMD} \
     PUPPETEER_SKIP_CHROMIUM_DOWNLOAD=true
@@ -75,13 +76,15 @@ RUN mkdir -p ${PYTHONPATH} superset/static superset-frontend apache_superset.egg
         libecpg-dev \
         libldap2-dev \
         git \
+    && apt-get upgrade -yqq \
     && touch superset/static/version_info.json \
     && chown -R superset:superset ./* \
     && rm -rf /var/lib/apt/lists/*
 
 COPY --chown=superset:superset setup.py MANIFEST.in README.md ./
 
-RUN pip install --force-reinstall git+https://github.com/HPEEzmeral/ezua-gunicorn.git@master
+RUN pip install --force-reinstall git+https://github.com/HPEEzmeral/ezua-gunicorn.git@master && \
+    pip install -U pip setuptools wheel
 # setup.py uses the version information in package.json
 COPY --chown=superset:superset superset-frontend/package.json superset-frontend/
 RUN --mount=type=bind,target=./requirements/local.txt,src=./requirements/local.txt \
@@ -111,8 +114,8 @@ CMD ["/usr/bin/run-server.sh"]
 # Dev image...
 ######################################################################
 FROM lean AS dev
-ARG GECKODRIVER_VERSION=v0.33.0 \
-    FIREFOX_VERSION=117.0.1
+ARG GECKODRIVER_VERSION=v0.36.0 \
+    FIREFOX_VERSION=128.14.0
 
 USER root
 
@@ -125,6 +128,7 @@ RUN apt-get update -qq \
         libasound2 \
         libxtst6 \
         wget \
+    && apt-get upgrade -yqq \
     # Install GeckoDriver WebDriver
     && wget -q https://github.com/mozilla/geckodriver/releases/download/${GECKODRIVER_VERSION}/geckodriver-${GECKODRIVER_VERSION}-linux64.tar.gz -O - | tar xfz - -C /usr/local/bin \
     # Install Firefox

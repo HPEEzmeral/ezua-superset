@@ -18,7 +18,7 @@
 ######################################################################
 # Node stage to deal with static asset construction
 ######################################################################
-ARG PY_VER=3.11.12-slim-bookworm
+ARG PY_VER=3.11-slim
 
 # if BUILDPLATFORM is null, set it to 'amd64' (or leave as is otherwise).
 ARG BUILDPLATFORM=${BUILDPLATFORM:-amd64}
@@ -31,7 +31,8 @@ RUN apt-get update -qq \
   && apt-get install \
   -yqq --no-install-recommends \
   build-essential \
-  python3
+  python3 \
+  && apt-get upgrade -yqq
 
 ENV BUILD_CMD=${NPM_BUILD_CMD} \
   PUPPETEER_SKIP_CHROMIUM_DOWNLOAD=true
@@ -81,6 +82,7 @@ RUN mkdir -p ${PYTHONPATH} superset/static requirements superset-frontend apache
   libpq-dev \
   libecpg-dev \
   libldap2-dev \
+  && apt-get upgrade -yqq \
   && touch superset/static/version_info.json \
   && chown -R superset:superset ./* \
   && rm -rf /var/lib/apt/lists/*
@@ -92,7 +94,8 @@ COPY --chown=superset:superset requirements/base.txt requirements/
 RUN --mount=type=cache,target=/root/.cache/pip \
   apt-get update -qq && apt-get install -yqq --no-install-recommends \
   build-essential pkg-config \
-  && pip install --upgrade setuptools pip \
+  && apt-get upgrade -yqq \
+  && pip install --upgrade setuptools pip wheel \
   && pip install -r requirements/base.txt \
   && apt-get autoremove -yqq --purge build-essential \
   && rm -rf /var/lib/apt/lists/*
@@ -140,6 +143,7 @@ RUN apt-get update -qq \
   libxtst6 \
   git \
   pkg-config \
+  && apt-get upgrade -yqq \
   && rm -rf /var/lib/apt/lists/*
 
 RUN --mount=type=cache,target=/root/.cache/pip \
@@ -148,11 +152,12 @@ RUN playwright install-deps
 RUN playwright install chromium
 
 # Install GeckoDriver WebDriver
-ARG GECKODRIVER_VERSION=v0.34.0 \
-  FIREFOX_VERSION=125.0.3
+ARG GECKODRIVER_VERSION=v0.36.0 \
+  FIREFOX_VERSION=128.14.0
 
 RUN apt-get update -qq \
   && apt-get install -yqq --no-install-recommends wget bzip2 \
+  && apt-get upgrade -yqq \
   && wget -q https://github.com/mozilla/geckodriver/releases/download/${GECKODRIVER_VERSION}/geckodriver-${GECKODRIVER_VERSION}-linux64.tar.gz -O - | tar xfz - -C /usr/local/bin \
   # Install Firefox
   && wget -q https://download-installer.cdn.mozilla.net/pub/firefox/releases/${FIREFOX_VERSION}/linux-x86_64/en-US/firefox-${FIREFOX_VERSION}.tar.bz2 -O - | tar xfj - -C /opt \
@@ -164,6 +169,7 @@ COPY --chown=superset:superset requirements/development.txt requirements/
 RUN --mount=type=cache,target=/root/.cache/pip \
   apt-get update -qq && apt-get install -yqq --no-install-recommends \
   build-essential \
+  && apt-get upgrade -yqq \
   && pip install -r requirements/development.txt \
   && apt-get autoremove -yqq --purge build-essential \
   && rm -rf /var/lib/apt/lists/*

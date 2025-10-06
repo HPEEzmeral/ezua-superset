@@ -93,7 +93,7 @@ COPY --chown=superset:superset superset-frontend/package.json superset-frontend/
 COPY --chown=superset:superset requirements/base.txt requirements/
 RUN --mount=type=cache,target=/root/.cache/pip \
   apt-get update -qq && apt-get install -yqq --no-install-recommends \
-  build-essential pkg-config \
+  build-essential pkg-config git \
   && apt-get upgrade -yqq \
   && pip install --upgrade setuptools pip wheel \
   && pip install -r requirements/base.txt \

@@ -263,6 +263,8 @@ prometheus-flask-exporter==0.23.2
     # via apache-superset
 prompt-toolkit==3.0.44
     # via click-repl
+psycopg2-binary==2.9.6
+    # via apache-superset
 pyarrow==14.0.2
     # via apache-superset
 pyasn1==0.6.0

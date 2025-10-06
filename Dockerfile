@@ -90,7 +90,7 @@ COPY --chown=superset:superset pyproject.toml setup.py MANIFEST.in README.md ./
 
 RUN pip install --force-reinstall git+https://github.com/HPEEzmeral/ezua-gunicorn.git@master
 #EZAF-12691
-RUN RUN pip install --force-reinstall git+https://github.com/HPEEzmeral/Flask-AppBuilder.git@release/4.6.0
+RUN pip install --force-reinstall git+https://github.com/HPEEzmeral/Flask-AppBuilder.git@release/4.6.0
 # setup.py uses the version information in package.json
 COPY --chown=superset:superset superset-frontend/package.json superset-frontend/
 COPY --chown=superset:superset requirements/base.txt requirements/
